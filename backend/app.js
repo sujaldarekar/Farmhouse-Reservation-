@@ -1,34 +1,42 @@
+/**
+ * Express Application Setup
+ * Configures middleware, routes, and database connectivity.
+ */
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 require('dotenv').config();
 
+// Route Imports
 const roomRoutes = require('./routes/roomRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 
-// Middleware
-app.use(cors());
-app.use(helmet());
-app.use(express.json());
+// Global Middleware
+app.use(cors());     // Enable Cross-Origin Resource Sharing
+app.use(helmet());   // Security headers
+app.use(express.json()); // Parse JSON request bodies
 
-// Routes
+// API Route Definitions
 app.use('/api/rooms', roomRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/auth', authRoutes);
 
-// Health check
-app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
+// Server Health Check
+app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Date() }));
 
-// Database connection
+/**
+ * Database Connection Function
+ * Uses environment variable MONGODB_URI for connection string.
+ */
 const connectDB = async () => {
   try {
     if (mongoose.connection.readyState === 0) {
       await mongoose.connect(process.env.MONGODB_URI);
-      console.log('MongoDB Connected');
+      console.log('MongoDB Connected successfully');
     }
   } catch (err) {
     console.error('MongoDB connection error:', err);

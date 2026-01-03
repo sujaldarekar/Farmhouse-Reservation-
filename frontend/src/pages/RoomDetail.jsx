@@ -1,3 +1,8 @@
+/**
+ * RoomDetail Page
+ * Displays detailed information for a specific farmhouse unit.
+ * Implements dynamic pricing calculation based on guest count.
+ */
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -11,6 +16,7 @@ const RoomDetail = () => {
   const [guests, setGuests] = useState(1);
 
   useEffect(() => {
+    // Fetch individual room data from backend
     const fetchRoom = async () => {
       try {
         const data = await getRoomById(id);
@@ -26,6 +32,12 @@ const RoomDetail = () => {
     fetchRoom();
   }, [id]);
 
+  /**
+   * Pricing Logic:
+   * 1. 2 Guests -> Couple Price (Flat Rate)
+   * 2. 5+ Guests -> Group Price (Per Head)
+   * 3. Default -> Standard Per Head Price
+   */
   const calculateTotal = () => {
     if (!room) return 0;
     if (guests === 2) return room.couplePrice;
@@ -33,6 +45,9 @@ const RoomDetail = () => {
     return room.perHeadPrice * guests;
   };
 
+  /**
+   * Helper to display which pricing plan is active
+   */
   const getPriceLabel = () => {
     if (guests === 2) return "(Couples Plan)";
     if (guests >= room?.minGroupSize) return `(Group Rate: ₹${room.groupPrice} per head)`;
@@ -58,6 +73,7 @@ const RoomDetail = () => {
       <Link to="/rooms" className="text-rose-500 font-bold mb-8 inline-block hover:underline">← Back to Plans</Link>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+        {/* Gallery Section */}
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -67,6 +83,7 @@ const RoomDetail = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
         </motion.div>
 
+        {/* Content Section */}
         <div className="space-y-8">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -77,12 +94,15 @@ const RoomDetail = () => {
               <span className="text-white/40 text-sm">Max {room.maxGuests} Guests</span>
             </div>
             <h1 className="text-6xl font-black mb-4 tracking-tighter">{room.name}</h1>
+            
+            {/* Real-time calculated price display */}
             <div className="flex flex-col gap-1">
               <div className="text-4xl font-black text-rose-500">₹{calculateTotal()}</div>
               <div className="text-white/40 text-sm font-medium uppercase tracking-wider">{getPriceLabel()}</div>
             </div>
           </motion.div>
 
+          {/* Guest Selector and Pricing Breakdown */}
           <div className="p-8 bg-white/5 rounded-3xl border border-white/10 space-y-6">
             <div>
               <label className="text-sm font-bold text-white/40 uppercase tracking-widest mb-3 block">Number of Guests</label>
@@ -103,6 +123,7 @@ const RoomDetail = () => {
               </div>
             </div>
 
+            {/* Pricing Details Card */}
             <div className="pt-4 border-t border-white/10 space-y-3">
               <div className="flex justify-between text-sm">
                 <span className="text-white/60">Couples Special</span>

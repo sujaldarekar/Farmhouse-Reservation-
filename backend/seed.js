@@ -1,7 +1,15 @@
+/**
+ * Seeding Script
+ * Populates the database with initial farmhouse units and the new pricing structure.
+ * Run this using: node seed.js
+ */
 const mongoose = require('mongoose');
+const dotenv = require('dotenv');
 const Room = require('./models/Room');
-require('dotenv').config();
 
+dotenv.config();
+
+// Initial database content
 const rooms = [
   {
     name: "Luxury Garden Suite",
@@ -49,12 +57,14 @@ const rooms = [
 
 const seedDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
     console.log('Connected to MongoDB for seeding...');
+    await mongoose.connect(process.env.MONGODB_URI);
     
+    // Clear existing data to avoid duplicates
     await Room.deleteMany({});
     console.log('Cleared existing rooms.');
     
+    // Insert new data
     await Room.insertMany(rooms);
     console.log('Successfully seeded rooms!');
     

@@ -1,13 +1,22 @@
 const mongoose = require("mongoose");
 
+/**
+ * Room Model
+ * Defines the schema for farmhouse units and their person-based pricing plans.
+ */
 const roomSchema = new mongoose.Schema({
   name: { type: String, required: true },
   description: { type: String, required: true },
-  price: { type: Number, required: true }, // Base price for a single person/default
-  couplePrice: { type: Number, default: 2500 },
-  perHeadPrice: { type: Number, default: 1500 },
-  groupPrice: { type: Number, default: 1200 },
-  minGroupSize: { type: Number, default: 5 },
+  
+  // Base price for a single person or default display
+  price: { type: Number, required: true }, 
+  
+  // Custom Pricing Plans as per requirement
+  couplePrice: { type: Number, default: 2500 }, // Flat rate for 2 guests
+  perHeadPrice: { type: Number, default: 1500 }, // Standard rate per person
+  groupPrice: { type: Number, default: 1200 },   // Discounted rate for large groups
+  minGroupSize: { type: Number, default: 5 },    // Threshold for group pricing
+  
   maxGuests: { type: Number, required: true },
   amenities: [String],
   images: [String],

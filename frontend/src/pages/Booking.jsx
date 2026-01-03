@@ -1,3 +1,8 @@
+/**
+ * Booking Page
+ * Handles the reservation form, dynamic room listing for selection,
+ * and API submission for creating new bookings.
+ */
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -11,6 +16,8 @@ const Booking = () => {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  
+  // Local state for form fields
   const [formData, setFormData] = useState({
     roomId: '',
     checkIn: '',
@@ -19,10 +26,12 @@ const Booking = () => {
   });
 
   useEffect(() => {
+    // Load available rooms to populate the dropdown
     const fetchRooms = async () => {
       try {
         const data = await getRooms();
         setRooms(data);
+        // Default to the first room in the list
         if (data.length > 0) {
           setFormData(prev => ({ ...prev, roomId: data[0]._id }));
         }
@@ -35,13 +44,17 @@ const Booking = () => {
     fetchRooms();
   }, []);
 
+  /**
+   * Handle form submission
+   * Sends the reservation data to the backend API.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
     try {
       await createBooking(formData);
       alert('Booking successful!');
-      navigate('/dashboard');
+      navigate('/dashboard'); // Take user to dashboard to see their booking
     } catch (err) {
       console.error('Booking failed:', err);
       alert(err.response?.data?.message || 'Failed to create booking. Please check if you are logged in.');
@@ -68,6 +81,7 @@ const Booking = () => {
         <p className="text-white/60 text-lg">Secure your dates at Morya Farmhouse.</p>
       </motion.div>
 
+      {/* Main Reservation Form */}
       <motion.form 
         onSubmit={handleSubmit}
         initial={{ opacity: 0, y: 20 }}
@@ -75,6 +89,7 @@ const Booking = () => {
         transition={{ delay: 0.2 }}
         className="space-y-6 glass-card shadow-2xl shadow-rose-500/5 p-10 rounded-[40px] border border-white/5"
       >
+        {/* Date Selectors */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Input 
             label="Check-in Date" 
@@ -92,6 +107,7 @@ const Booking = () => {
           />
         </div>
 
+        {/* Room Selection Dropdown */}
         <div className="space-y-2">
           <label className="text-sm font-bold text-white/40 uppercase tracking-widest ml-1">Select Your Plan</label>
           <select 
@@ -107,6 +123,7 @@ const Booking = () => {
           </select>
         </div>
 
+        {/* Guest Count Input */}
         <Input 
           label="Total Guests" 
           type="number" 
@@ -116,7 +133,8 @@ const Booking = () => {
           onChange={(e) => setFormData({ ...formData, guests: parseInt(e.target.value) })}
         />
 
-        <Button type="submit" disabled={submitting} className="w-full py-5 mt-4 text-lg font-black uppercase tracking-widest">
+        {/* Action Button */}
+        <Button type="submit" disabled={submitting} className="w-full py-5 mt-4 text-lg font-black uppercase tracking-widest text-white">
           {submitting ? 'Processing...' : 'Confirm Reservation'}
         </Button>
       </motion.form>
